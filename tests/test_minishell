@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+function test()
+{
+    echo -ne "\e[1m[$1]\e[0m\n"
+    echo -ne "$1" | $2 ./mysh &> .my
+    echo -ne "$1" | $2 tcsh &> .exp
+    diff .my .exp &> /dev/null
+    if [[ $? != 0 ]]; then
+        echo -ne "\e[91;1mko\e[0m: [$1]\n"
+        cat .my
+        echo vs
+        cat .exp
+    else
+        echo -ne "\e[92;1mok\n\e[0m"
+    fi
+    rm .my .exp
+}
+
+test "ls"
+test "ls -l"
+test "cd"
+test "cat main.c"
+test "cd .."
+test "cd include"
+test "kols"
+test "./mysh"
+test "rien"
+test "                        ls                 "
+test "                       ls                                     -l"
+test "                          ls                                                mo"
+test "mo ls"
+test "arcd"
+test "                           cd"
+test "cd il"
+test "lokiiiiiiils"
+test " "
+test "honoooooooooooooooooooooocd ls cat main"
+test "cat inexistant"
+test "cat main.c"
+test "cat ls"
+test "                                                 rls"
+test " -l ls "
+test "                  cd                                 include"
+test " ls -            d"
+test "ls -hehe"
+test "                              "
+test ""
+test "bite"
+test "/bin/tree"
+test "cd bite"
+test " \t"
+test "\t"
+test " \t     \t"
+echo "int main() {return 1/0;}" > .test0.c; gcc -w .test0.c
+test "./a.out"
+rm -f .test0.c a.out
+echo "main;" > .test0.c; gcc -w .test0.c
+test "./a.out"
+rm -f .test0.c a.out
+test "./lib"
+test ";"
+test "ls;ls"
+test "ls;  ;ls;"
+test ";;;;;;;;;;ls;        ; ;            ;;     ls;;; ;"
+# test "ls | cat -e"
+# test "ls | grep mysh | wc"
+# test "ls | cat -e | wc -l | cat -e | grep "$" | wc -l"
+test "ls > lol; cat lol; rm -f lol"
+test "ls > lol; ls >> lol; cat lol; rm -f lol"
+echo "ls > .test" | tcsh
+test "cat -e < .test"
+rm .test
+test "cat < ZKNDAKD"
+#test "mkdir test ; cd test ; ls -a ; ls | cat | wc -c > tutu ; cat tutu; rm -f tutu; cd ..; rm -rf test"
+test "ls >"
+test "ls >>"
+test "ls <<"
+test "ls <"
+test "<< ls"
+test "< ls"
+test "> ls"
+test ">> ls"
+test "| ls"

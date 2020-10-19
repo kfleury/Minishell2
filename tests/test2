@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+
+## Var def
+RED='\e[91;1m'
+GREEN='\e[92:1m'
+BLUE='\e[94:1m'
+NC='\e[0m'
+SCORE=0
+TOTAL=0
+
+## Option
+[[ $1 = "-v" ]] && VERBOSE=1 || VERBOSE=0
+
+## Help
+if [[ $1 = "-h" ]]; then
+    echo -e " # 42SH HOME MOULI #\n"
+    echo "Option:"
+    echo "   -v    Display difference between your output and tcsh output"
+    echo -e "\nCredit:"
+    echo "  Made by Episauce."
+    exit
+fi
+
+function result()
+{
+    echo -e "\n---------------- RESULT ----------------"
+    echo -e "${BLUE}Done${NC}:    ${TOTAL}"
+    echo -e "${GREEN}Success${NC}: ${SCORE}"
+    echo -e "${RED}Failed${NC}:  $(($TOTAL-$SCORE))"
+    echo "print(f'Score:   {$SCORE/$TOTAL*100:.2f}%')" | python3
+}
+
+## Verbose version
+function display_info()
+{
+    echo "-------------"
+    echo "Got: "
+    cat $1
+    echo "Expected: "
+    cat $2
+}
+
+## Test
+function test()
+{
+    TOTAL=$(($TOTAL+1))
+    echo -e "\nInput: [$1]"
+    echo -e "$1" | ./mysh &> .my # ça
+    echo -e "$1" | tcsh &> .exp # ça
+    diff .my .exp &> /dev/null # ça
+    if [[ $? != 0 ]]; then # ça
+        echo -e "Result: ${RED}KO${NC}" # ça
+        if [ ${VERBOSE} -eq 1 ]; then
+            display_info .my .exp
+        fi # ça
+    else # ça
+        echo -e "Result: ${GREEN}OK${NC}" # ça
+        SCORE=$(($SCORE+1))
+    fi # ça
+    rm .my .exp # ça
+}
+
+######################################## TEST ###########################################
+test "ls"
+test "ls -l"
+test "cd"
+test "cat main.c"
+test "cd .."
+test "cd include"
+test "kols"
+test "./mysh"
+test "rien"
+test "                        ls                 "
+test "                       ls                                     -l"
+test "                          ls                                                mo"
+test "mo ls"
+test "arcd"
+test "                           cd"
+test "cd il"
+test "lokiiiiiiils"
+test " "
+test "honoooooooooooooooooooooocd ls cat main"
+test "cat inexistant"
+test "cat main.c"
+test "cat ls"
+test "                                                 rls"
+test " -l ls "
+test "                  cd                                 include"
+test " ls -            d"
+test "ls -hehe"
+test "                              "
+test ""
+test "bite"
+test "/bin/tree"
+test "cd bite"
+test " \t"
+test "\t"
+test " \t     \t"
+echo "int main() {return 1/0;}" > .test0.c; gcc -w .test0.c
+test "./a.out"
+rm -f .test0.c a.out
+echo "main;" > .test0.c; gcc -w .test0.c
+test "./a.out"
+rm -f .test0.c a.out
+test "./lib"
+test ";"
+test "ls;ls"
+test "ls;  ;ls;"
+test ";;;;;;;;;;ls;        ; ;            ;;     ls;;; ;"
+test "ls | cat -e"
+test "ls | grep mysh | wc"
+test "ls | cat -e | wc -l | cat -e | grep "$" | wc -l"
+test "ls > lol; cat lol; rm -f lol"
+test "ls > lol; ls >> lol; cat lol; rm -f lol"
+echo "ls > .test" | tcsh
+test "cat -e < .test"
+rm .test
+test "cat < ZKNDAKD"
+test "mkdir test ; cd test ; ls -a ; ls | cat | wc -c > tutu ; cat tutu; rm -f tutu; cd ..; rm -rf test"
+test "ls >"
+test "ls >>"
+test "ls <<"
+test "ls <"
+test "<< ls"
+test "< ls"
+test "> ls"
+test ">> ls"
+test "| ls"
+test "setenv 12 a"
+test "setenv a12 a"
+test "setenv a// 12"
+test "unsetenv a// 12"
+test "unsetenv HOME ZSH PWD"
+test "ls | cat -e"
+test "ls | cat -e; ls > oui.txt; cat oui.txt ;rm oui.txt"
+test "ls | ls"
+test "env | grep PATH"
+test "man gcc | cat"
+
+result
